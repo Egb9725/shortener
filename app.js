@@ -1,3 +1,5 @@
+require('dotenv').config(); 
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
@@ -54,7 +56,7 @@ app.post('/shorten', ensureAuthenticated, async (req, res) => {
   const shortCode = crypto.randomBytes(4).toString('hex');
 
   try {
-    await pool.query('INSERT INTO urls (long_url, short_code) VALUES ($1, $2)', [longUrl, shortCode]);
+    await pool.query('INSERT INTO urls (long_url, short_url) VALUES ($1, $2)', [longUrl, shortCode]);
     const shortUrl = `http://localhost:${process.env.PORT}/${shortCode}`;
     const qrCode = await QRCode.toDataURL(shortUrl);
 
@@ -70,7 +72,7 @@ app.get('/:shortCode', async (req, res) => {
   const { shortCode } = req.params;
 
   try {
-    const result = await pool.query('SELECT long_url FROM urls WHERE short_code = $1', [shortCode]);
+    const result = await pool.query('SELECT long_url FROM urls WHERE short_url = $1', [shortCode]);
 
     if (result.rows.length > 0) {
       res.redirect(result.rows[0].long_url);
