@@ -1,15 +1,29 @@
-<%- include("./partials/header.ejs",{title:"Raccourcisseur d'URL" }) %>
-
-  <h1>Raccourcir une URL</h1>
-  <form action="/shorten" method="post">
-    <input type="url" name="longUrl" required>
-    <button type="submit">Raccourcir</button>
-  </form>
-  <% if (shortUrl) { %>
-    <p>URL raccourcie : <a href="<%= shortUrl %>"><%= shortUrl %></a></p>
-    <img src="<%= qrCode %>" alt="QR Code">
-  <% } %>
-
-
-
-<%- include("./partials/footer.ejs") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Raccourcisseur d'URL avec QR Code</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Mini Raccourcisseur d'URL avec Génération de QR Code</h1>
+            <form action="/shorten" method="post">
+                <div class="field">
+                    <label class="label">Entrez l'URL à raccourcir</label>
+                    <div class="control">
+                        <input class="input" type="url" name="url" placeholder="https://exemple.com" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Raccourcir l'URL</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</body>
+</html>

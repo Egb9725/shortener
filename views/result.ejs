@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat du Raccourcissement d'URL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">URL Raccourcie avec QR Code</h1>
+            <div class="box">
+                <p><strong>URL originale :</strong> <a href="<%= originalUrl %>" target="_blank"><%= originalUrl %></a></p>
+                <p><strong>URL raccourcie :</strong> <a href="<%= shortUrl %>" target="_blank"><%= shortUrl %></a></p>
+                <div class="qr-code">
+                    <img src="<%= qrCodeUrl %>" alt="QR Code">
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <a class="button is-link" href="/">Raccourcir une autre URL</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
