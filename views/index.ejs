@@ -1,0 +1,15 @@
+<%- include("./partials/header.ejs",{title:"Raccourcisseur d'URL" }) %>
+<h1>URL Shortener</h1>
+<main>
+  <form id="url-form" action="/shorten" method="POST">
+    <input type="text" id="long-url" name="longUrl" placeholder="Enter a long URL" required>
+    <button type="submit">Shorten URL</button>
+  </form>
+  <% if (typeof shortUrl !== 'undefined') { %>
+    <div id="result">
+      <p>Your short URL is: <a href="<%= shortUrl %>" target="_blank"><%= shortUrl %></a></p>
+    </div>
+  <% } %>
+</main>
+
+<%- include("./partials/footer.ejs") %>

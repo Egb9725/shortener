@@ -1,0 +1,45 @@
+/* Styles CSS pour la mise en forme de l'application */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  main {
+    padding: 40px;
+  }
+  form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+  }
+  input, button {
+    padding: 10px;
+    font-size: 16px;
+  }
+  input {
+    width: 300px;
+    border: 1px solid #ccc;
+  }
+  button {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  #short-url {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 20px;
+  }
+  #stats-container {
+    margin-top: 40px;
+  }
+  .stat-item {
+    margin-bottom: 20px;
+  }
