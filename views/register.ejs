@@ -1,0 +1,14 @@
+<%- include("./partials/header.ejs",{title:"Register" }) %>
+
+  <h1>Inscription</h1>
+  <form action="/register" method="post">
+    <input type="text" name="username" required placeholder="Nom d'utilisateur">
+    <input type="password" name="password" required placeholder="Mot de passe">
+    <button type="submit">S'inscrire</button>
+  </form>
+  <% if (message) { %>
+    <p><%= message %></p>
+  <% } %>
+
+
+<%- include("./partials/footer.ejs") %>

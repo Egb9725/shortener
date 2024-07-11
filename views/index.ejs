@@ -1,15 +1,15 @@
 <%- include("./partials/header.ejs",{title:"Raccourcisseur d'URL" }) %>
-<h1>URL Shortener</h1>
-<main>
-  <form id="url-form" action="/shorten" method="POST">
-    <input type="text" id="long-url" name="longUrl" placeholder="Enter a long URL" required>
-    <button type="submit">Shorten URL</button>
+
+  <h1>Raccourcir une URL</h1>
+  <form action="/shorten" method="post">
+    <input type="url" name="longUrl" required>
+    <button type="submit">Raccourcir</button>
   </form>
-  <% if (typeof shortUrl !== 'undefined') { %>
-    <div id="result">
-      <p>Your short URL is: <a href="<%= shortUrl %>" target="_blank"><%= shortUrl %></a></p>
-    </div>
+  <% if (shortUrl) { %>
+    <p>URL raccourcie : <a href="<%= shortUrl %>"><%= shortUrl %></a></p>
+    <img src="<%= qrCode %>" alt="QR Code">
   <% } %>
-</main>
+
+
 
 <%- include("./partials/footer.ejs") %>
