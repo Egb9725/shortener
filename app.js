@@ -2,8 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const flash = require('express-flash');
 const passport = require('passport');
-const initializePassport = require('./passport-config');
-const { pool } = require('./db');
+const initializePassport = require('./config/passport-config');  // Ajustez le chemin
+
+const { pool } = require('./config/db');
 const bcrypt = require('bcrypt');
 const app = express();
 
