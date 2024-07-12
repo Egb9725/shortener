@@ -42,7 +42,7 @@ app.post('/shorten', async (req, res) => {
 
         res.render('result', { originalUrl, shortUrl, qrCodeUrl });
     } catch (error) {
-        console.error('Error handling the shorten request:', error);
+        console.error('Erreur lors du traitement de la demande de redirection', error);
         res.status(500).send('Something went wrong');
     }
 });
@@ -58,7 +58,7 @@ app.get('/:shortCode', async (req, res) => {
             res.sendStatus(404);
         }
     } catch (error) {
-        console.error('Error handling the redirect request:', error);
+        console.error('Erreur lors du traitement de la demande de redirection :', error);
         res.status(500).send('Something went wrong');
     }
 });
