@@ -23,6 +23,12 @@
                     </div>
                 </div>
             </form>
+            <% if (user) { %>
+                <a href="/auth/logout">Déconnexion</a>
+            <% } else { %>
+                <a href="/auth/login">Connexion</a>
+                <a href="/auth/register">Inscription</a>
+            <% } %>
         </div>
     </section>
 </body>

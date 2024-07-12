@@ -1,64 +1,61 @@
+// Importation des modules nécessaires
 const express = require('express');
 const bodyParser = require('body-parser');
-const { Pool } = require('pg');
-const qr = require('qrcode');
+const session = require('express-session');
+const passport = require('passport');
+const { pool } = require('./config/db');
 const dotenv = require('dotenv');
 
+// Charger les variables d'environnement depuis le fichier .env
 dotenv.config();
 
+// Initialisation de l'application Express
 const app = express();
+
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));  // Dossier pour les fichiers statiques comme styles.css
+
+// Configuration du moteur de rendu EJS
 app.set('view engine', 'ejs');
 
-const pool = new Pool({
-    user: process.env.DB_USER,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    password: process.env.DB_PASSWORD,
-    port: process.env.DB_PORT,
-});
+// Configuration de la connexion à la base de données PostgreSQL
+// Utilisez le pool de connexions exporté depuis db.js
+const pool = require('./config/db').pool;
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-});
+// Configuration de session
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
 
-app.get('/', (req, res) => {
-    res.render('index');
-});
+// Initialisation de Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
-function generateShortCode() {
-    return Math.random().toString(36).substring(2, 8);
+// Import de la configuration de Passport
+require('./config/passport-config');
+
+// Middleware pour vérifier si l'utilisateur est authentifié
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/auth/login');
 }
 
-app.post('/shorten', async (req, res) => {
-    try {
-        const originalUrl = req.body.url;
-        const shortCode = generateShortCode();
-        const shortUrl = `${req.protocol}://${req.get('host')}/${shortCode}`;
-        
-        await pool.query('INSERT INTO urls (short_code, original_url) VALUES ($1, $2)', [shortCode, originalUrl]);
+// Routes
+const indexRouter = require('./app/routes/index');
+const authRouter = require('./app/routes/authRoutes');
+const urlRouter = require('./app/routes/urlRoutes');
 
-        const qrCodeUrl = await qr.toDataURL(shortUrl);
+app.use('/', indexRouter);
+app.use('/auth', authRouter);
+app.use('/urls', isAuthenticated, urlRouter); // Protéger les routes des URLs
 
-        res.render('result', { originalUrl, shortUrl, qrCodeUrl });
-    } catch (error) {
-        console.error('Erreur lors du traitement de la demande de redirection', error);
-        res.status(500).send('Something went wrong');
-    }
-});
-
-app.get('/:shortCode', async (req, res) => {
-    try {
-        const shortCode = req.params.shortCode;
-        const result = await pool.query('SELECT original_url FROM urls WHERE short_code = $1', [shortCode]);
-        
-        if (result.rows.length > 0) {
-            res.redirect(result.rows[0].original_url);
-        } else {
-            res.sendStatus(404);
-        }
-    } catch (error) {
-        console.error('Erreur lors du traitement de la demande de redirection :', error);
-        res.status(500).send('Something went wrong');
-    }
+// Démarrage du serveur sur le port 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
