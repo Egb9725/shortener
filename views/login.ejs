@@ -17,17 +17,6 @@
                 </div>
             <% } %>
 
-            <% if (error_msg) { %>
-                <div class="notification is-danger">
-                    <%= error_msg %>
-                </div>
-            <% } %>
-
-            <% if (error) { %>
-                <div class="notification is-danger">
-                    <%= error %>
-                </div>
-            <% } %>
 
             <form action="/auth/login" method="post">
                 <div class="field">

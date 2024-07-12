@@ -10,14 +10,32 @@ const app = express();
 
 initializePassport(passport);
 
+
+// Configuration des sessions
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
+
+// Configuration de connect-flash
+app.use(flash());
+
+// Middleware pour rendre les messages flash accessibles dans les vues
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    next();
+});
+
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(flash());
+// app.use(session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false
+// }));
+// app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -26,7 +44,12 @@ app.get('/', checkAuthenticated, async (req, res) => {
     res.render('index', { user: req.user, urls: result.rows });
 });
 
-app.get('/login', checkNotAuthenticated, (req, res) => {
+// app.get('/login', checkNotAuthenticated, (req, res) => {
+//     res.render('login');
+// });
+app.get('/login', (req, res) => {
+    // Définir un message de succès pour le test
+    req.flash('success_msg', 'Vous avez réussi à vous connecter');
     res.render('login');
 });
 
