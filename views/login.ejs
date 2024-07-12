@@ -10,25 +10,43 @@
     <section class="section">
         <div class="container">
             <h1 class="title">Connexion</h1>
+
+            <% if (success_msg) { %>
+                <div class="notification is-success">
+                    <%= success_msg %>
+                </div>
+            <% } %>
+
+            <% if (error_msg) { %>
+                <div class="notification is-danger">
+                    <%= error_msg %>
+                </div>
+            <% } %>
+
+            <% if (error) { %>
+                <div class="notification is-danger">
+                    <%= error %>
+                </div>
+            <% } %>
+
             <form action="/auth/login" method="post">
                 <div class="field">
-                    <label class="label">Email</label>
+                    <label class="label">Nom d'utilisateur</label>
                     <div class="control">
-                        <input class="input" type="email" name="email" placeholder="Votre email" required>
+                        <input class="input" type="text" name="username" required>
                     </div>
                 </div>
                 <div class="field">
                     <label class="label">Mot de passe</label>
                     <div class="control">
-                        <input class="input" type="password" name="password" placeholder="Votre mot de passe" required>
+                        <input class="input" type="password" name="password" required>
                     </div>
                 </div>
                 <div class="field">
                     <div class="control">
-                        <button class="button is-primary" type="submit">Se connecter</button>
+                        <button class="button is-primary" type="submit">Connexion</button>
                     </div>
                 </div>
-                <p>Pas encore inscrit ? <a href="/auth/register">Créer un compte</a></p>
             </form>
         </div>
     </section>

@@ -1,61 +1,93 @@
-// Importation des modules nécessaires
 const express = require('express');
-const bodyParser = require('body-parser');
 const session = require('express-session');
+const flash = require('express-flash');
 const passport = require('passport');
-const { pool } = require('./config/db');
-const dotenv = require('dotenv');
-
-// Charger les variables d'environnement depuis le fichier .env
-dotenv.config();
-
-// Initialisation de l'application Express
+const initializePassport = require('./passport-config');
+const { pool } = require('./db');
+const bcrypt = require('bcrypt');
 const app = express();
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));  // Dossier pour les fichiers statiques comme styles.css
+initializePassport(passport);
 
-// Configuration du moteur de rendu EJS
 app.set('view engine', 'ejs');
-
-// Configuration de la connexion à la base de données PostgreSQL
-// Utilisez le pool de connexions exporté depuis db.js
-const pool = require('./config/db').pool;
-
-// Configuration de session
+app.use(express.urlencoded({ extended: false }));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
 }));
-
-// Initialisation de Passport
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Import de la configuration de Passport
-require('./config/passport-config');
+app.get('/', checkAuthenticated, async (req, res) => {
+    const result = await pool.query('SELECT * FROM urls WHERE user_id = $1', [req.user.id]);
+    res.render('index', { user: req.user, urls: result.rows });
+});
 
-// Middleware pour vérifier si l'utilisateur est authentifié
-function isAuthenticated(req, res, next) {
+app.get('/login', checkNotAuthenticated, (req, res) => {
+    res.render('login');
+});
+
+app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+app.get('/register', checkNotAuthenticated, (req, res) => {
+    res.render('register');
+});
+
+app.post('/register', checkNotAuthenticated, async (req, res) => {
+    try {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        await pool.query(
+            'INSERT INTO users (username, password) VALUES ($1, $2)',
+            [req.body.username, hashedPassword]
+        );
+        res.redirect('/login');
+    } catch (err) {
+        res.redirect('/register');
+    }
+});
+
+app.post('/shorten', checkAuthenticated, async (req, res) => {
+    const shortUrl = generateShortUrl();
+    await pool.query(
+        'INSERT INTO urls (original_url, short_url, user_id) VALUES ($1, $2, $3)',
+        [req.body.original_url, shortUrl, req.user.id]
+    );
+    res.redirect('/');
+});
+
+app.get('/logout', (req, res) => {
+    req.logout(function(err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/login');
+    });
+});
+
+function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect('/auth/login');
+    res.redirect('/login');
 }
 
-// Routes
-const indexRouter = require('./app/routes/index');
-const authRouter = require('./app/routes/authRoutes');
-const urlRouter = require('./app/routes/urlRoutes');
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return res.redirect('/');
+    }
+    next();
+}
 
-app.use('/', indexRouter);
-app.use('/auth', authRouter);
-app.use('/urls', isAuthenticated, urlRouter); // Protéger les routes des URLs
+function generateShortUrl() {
+    return Math.random().toString(36).substring(2, 8);
+}
 
-// Démarrage du serveur sur le port 3000
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(3000, () => {
+    console.log('Server is running on port 3000');
 });
